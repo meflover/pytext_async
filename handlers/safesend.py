@@ -13,3 +13,5 @@ async def safe_send(send_func, *args, **kwargs):
 
 async def answer(message, text):
     await safe_send(message.answer, text)
+async def reply(message, text):
+    await safe_send(message.reply, text)
