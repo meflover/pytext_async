@@ -1,7 +1,7 @@
 import asyncio
 from bot import bot,dp
 from session import session
-from handlers import commands, text
+from handlers import inputs
 
 async def main():
     await dp.start_polling(bot)
