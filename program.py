@@ -1,9 +1,14 @@
+from aiogram.types import Message
+from handlers.safesend import *
+from session import session
+from storage.sql import DSQL
+
 class Editor:
     def __init__(self):
         self.pointers = [".", ",", "!", "?", ":", ";"]
         self.up_pointers = [".", "!", "?"]
 
-    def commands(self, user_text, text):
+    def commands_(self, user_text, text):
         parts = text.split()
         if not parts:
             return
@@ -44,4 +49,24 @@ class Editor:
                 chars[i+2] = chars[i+2].upper()
 
         return "".join(chars)
+
+    @staticmethod
+    async def commands(message: Message):
+        parts = message.text.split(maxsplit=1)
+        if parts[0] == '/start':
+            user_id = message.from_user.id
+            if user_id in session.users:
+                del session.users[user_id]
+            user = session.short_init(user_id)
+            await reply(message.reply, "Пришлите ваш текст!")
+    @staticmethod
+    async def message(message: Message):
+        user = session.short_init(message.from_user.id)
+        if user.text != None:
+            user.text = program.commands_(user.text, message.text)
+        elif user.text == None:
+            user.text = program.clear(message.text)
+        DSQL.putin(user.id, user.text)
+        await answer(user.id, user.text)
+
 program = Editor()
